@@ -1,0 +1,45 @@
+function calculate() {
+  const coin = document.getElementById('coin').value.toUpperCase();
+  const capital = parseFloat(document.getElementById('capital').value);
+  const entry = parseFloat(document.getElementById('entry').value);
+  const sl = parseFloat(document.getElementById('sl').value);
+  const tp = parseFloat(document.getElementById('tp').value);
+
+  if (!coin || isNaN(capital) || isNaN(entry) || isNaN(sl)) {
+    document.getElementById('result').innerHTML = '❌ Please fill all fields correctly.';
+    return;
+  }
+
+  const positionSize = capital / entry;
+
+  // SELL trade logic
+  const slDiff = sl - entry;
+  const slLoss = slDiff * positionSize;
+  const slPercent = (slLoss / capital) * 100;
+
+  let result = `
+    <strong>Coin:</strong> ${coin}<br/>
+    <strong>Position Size:</strong> ${positionSize.toFixed(4)} ${coin}<br/>
+  `;
+
+  if (slLoss > 0) {
+    result += `<strong>Loss at SL:</strong> $${slLoss.toFixed(2)} (${slPercent.toFixed(2)}%)<br/>`;
+  } else {
+    result += `<strong>SL is in profit (for SELL trade this is wrong)</strong><br/>`;
+  }
+
+  // TP calculation (SELL trade: TP < entry = profit)
+  if (!isNaN(tp)) {
+    const tpDiff = entry - tp;
+    const tpProfit = tpDiff * positionSize;
+    const tpPercent = (tpProfit / capital) * 100;
+
+    if (tpProfit > 0) {
+      result += `<strong>Profit at TP:</strong> $${tpProfit.toFixed(2)} (${tpPercent.toFixed(2)}%)<br/>`;
+    } else {
+      result += `<strong>TP is in loss (for SELL trade this is wrong)</strong><br/>`;
+    }
+  }
+
+  document.getElementById('result').innerHTML = result;
+}
